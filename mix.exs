@@ -35,4 +35,18 @@ defmodule Hamlex.Mixfile do
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false, github: "ignota/mix-test.watch", ref: "8ee5c331059e821830a325cd59e87821b3434f88"}, # TODO: waiting for https://github.com/lpil/mix-test.watch/pull/85
     ]
   end
+
+  defp description() do
+    "Haml template engine that doesn't depend on EEx."
+  end
+
+  defp package() do
+    [
+      # These are the default files included in the package
+      files: ["lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      maintainers: ["Marnen Laibow-Koser"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/marnen/hamlex"}
+    ]
+  end
 end
