@@ -31,7 +31,8 @@ defmodule Hamlex.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:espec, "~> 1.4.6", only: :test}
+      {:espec, "~> 1.4.6", only: :test},
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
     ]
   end
 end
