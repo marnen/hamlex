@@ -3,16 +3,14 @@ defmodule Hamlex do
   Documentation for Hamlex.
   """
 
+  @type haml :: String.t
+  @type html :: String.t
+
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Hamlex.hello
-      :world
-
+  Renders a Haml string to HTML.
   """
-  def hello do
-    :world
+  @spec render(haml) :: html
+  def render(haml) do
+    "HTML version of #{haml}"
   end
 end
