@@ -1,5 +1,4 @@
-defmodule Hamlex.Renderer do
-
+defmodule Hamlex.Renderers.Prolog do
   @prologs %{
     "html4" => %{
       "" => ~S(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">),
@@ -22,8 +21,8 @@ defmodule Hamlex.Renderer do
     },
   }
 
-  @spec prolog(String.Chars.t, keyword) :: Hamlex.html
-  def prolog(body, [format: format]) do
+  @spec to_html(String.Chars.t, keyword) :: Hamlex.html
+  def to_html(body, [format: format]) do
     prologs = prologs_for_format format
     body = body |> to_string |> String.trim
     case Map.fetch(prologs, body) do

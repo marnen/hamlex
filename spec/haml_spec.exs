@@ -5,13 +5,17 @@ defmodule HamlSpec do
   tests = Poison.Parser.parse! json
 
   @context_names [
-    "headers"
+    "headers",
+    "basic Haml tags and CSS"
   ]
 
   for {context_name, example_data} <- tests, context_name in @context_names do
     context context_name do
-      for {name, %{"haml" => haml, "html" => html, "config" => config}} <- example_data do
-        opts = for {key, value} <- config, do: {key |> String.to_atom, value}
+      for {name, %{"haml" => haml, "html" => html} = fields} <- example_data do
+        opts = case fields do
+          %{"config" => config} -> for {key, value} <- config, do: {key |> String.to_atom, value}
+          _ -> []
+        end
         specify name do
           expect(Hamlex.render unquote(haml), unquote(opts)).to eq unquote(html)
         end
