@@ -22,11 +22,14 @@ defmodule Hamlex.Parser do
   defp element do
     sequence [
       string(@sigils.element),
-      word,
+      element_name,
       many(selector),
-      option(string "/"),
       rest
     ]
+  end
+
+  defp element_name do
+    pipe [word, option(string "/")], &Enum.join/1
   end
 
   defp implicit_div do

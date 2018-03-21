@@ -22,9 +22,8 @@ defmodule Hamlex do
 
   defp to_html(["!!!" | body], opts), do: Prolog.to_html(body, opts)
 
-  defp to_html(["%", name, selectors, slash, body], opts) do
-    self_closing = slash == "/"
-    Element.to_html name, selectors, body, Keyword.merge(opts, self_closing: self_closing)
+  defp to_html(["%", name, selectors, body], opts) do
+    Element.to_html name, selectors, body, opts
   end
 
   defp to_html(["%%", selectors, body], opts) do
