@@ -1,5 +1,5 @@
 defmodule Hamlex.Node.Element do
-  alias Hamlex.Node
+  alias Hamlex.{Node, Utils}
   @derive [Node]
   @type selector :: String.t
   @type t :: %__MODULE__{name: String.t, selectors: [selector], body: [Node.t]}
@@ -25,18 +25,11 @@ defmodule Hamlex.Node.Element do
   defp content_tag(%__MODULE__{body: body} = element, opts) do
     body_html = case body do
       [] -> nil
-      _ -> "\n" <> indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
+      _ -> "\n" <> Utils.indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
     end
     IO.puts Enum.join [opening_tag(element), body_html, closing_tag(element)]
 
     Enum.join [opening_tag(element), body_html, closing_tag(element)]
-  end
-
-  # TODO: move elsewhere
-  defp indent(string, increment \\ 2) do
-    spaces = String.duplicate " ", increment
-    lines = for line <- String.split(string, "\n"), do: spaces <> line
-    Enum.join lines, "\n"
   end
 
   defp opening_tag(%__MODULE__{} = element) do
