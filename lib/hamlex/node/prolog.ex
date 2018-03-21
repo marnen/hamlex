@@ -1,7 +1,8 @@
 defmodule Hamlex.Node.Prolog do
-  @derive [Hamlex.Node]
-  @type t :: %__MODULE__{type: String.t}
-  defstruct type: ""
+  alias Hamlex.Node
+  @derive [Node]
+  @type t :: %__MODULE__{type: String.t, body: []}
+  defstruct type: "", body: []
 
   @prologs %{
     "html4" => %{
@@ -26,7 +27,7 @@ defmodule Hamlex.Node.Prolog do
   }
 
   @spec to_html(t, keyword) :: Hamlex.html
-  def to_html(%__MODULE__{type: type}, opts \\ []) do
+  def to_html(%__MODULE__{type: type, body: []}, opts \\ []) do
     opts = Keyword.merge Hamlex.default_options, opts
     format = opts[:format]
     prologs = prologs_for_format format

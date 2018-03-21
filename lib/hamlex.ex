@@ -1,5 +1,5 @@
 defmodule Hamlex do
-  alias Hamlex.Node
+  alias Hamlex.{Node, Tree}
   @moduledoc """
   Documentation for Hamlex.
   """
@@ -8,6 +8,7 @@ defmodule Hamlex do
 
   @type haml :: String.t
   @type html :: String.t
+  @type line :: {integer, Node.t}
 
   @spec default_options() :: keyword
   def default_options do
@@ -19,22 +20,9 @@ defmodule Hamlex do
   """
   @spec render(haml, keyword) :: html
   def render(haml, opts \\ []) do
-    parsed = Hamlex.Parser.parse(haml)
-    parsed |> to_html(opts)
-  end
-
-  @typep line :: {integer, Node.t}
-
-  @spec to_html([[line]], keyword) :: html
-  defp to_html([lines], opts) do
-    Enum.join (for {indent, node} <- lines, do: Node.to_html node, opts), "\n"
-  end
-
-  defp to_html(["%", name, selectors, body], opts) do
-    Element.to_html name, selectors, body, opts
-  end
-
-  defp to_html(["%%", selectors, body], opts) do
-    Element.to_html selectors, body, opts
+    [parsed] = Hamlex.Parser.parse(haml)
+    tree = Tree.from(parsed)
+    IO.inspect tree
+    tree |> Enum.map_join(&(Node.to_html &1, opts))
   end
 end

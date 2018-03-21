@@ -1,8 +1,9 @@
 defmodule Hamlex.Node.Element do
-  @derive [Hamlex.Node]
+  alias Hamlex.Node
+  @derive [Node]
   @type selector :: String.t
-  @type t :: %__MODULE__{name: String.t, selectors: [selector], body: any}
-  defstruct name: "div", selectors: [], body: nil
+  @type t :: %__MODULE__{name: String.t, selectors: [selector], body: [Node.t]}
+  defstruct name: "div", selectors: [], body: []
 
   @void_elements ~w[area base br col embed hr img input link meta param source track wbr] # see https://www.w3.org/TR/html52/syntax.html#void-elements
 
@@ -17,8 +18,25 @@ defmodule Hamlex.Node.Element do
         _ -> void_tag element
       end
     else
-      opening_tag(element) <> closing_tag(element)
+      content_tag(element, opts)
     end
+  end
+
+  defp content_tag(%__MODULE__{body: body} = element, opts) do
+    body_html = case body do
+      [] -> nil
+      _ -> "\n" <> indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
+    end
+    IO.puts Enum.join [opening_tag(element), body_html, closing_tag(element)]
+
+    Enum.join [opening_tag(element), body_html, closing_tag(element)]
+  end
+
+  # TODO: move elsewhere
+  defp indent(string, increment \\ 2) do
+    spaces = String.duplicate " ", increment
+    lines = for line <- String.split(string, "\n"), do: spaces <> line
+    Enum.join lines, "\n"
   end
 
   defp opening_tag(%__MODULE__{} = element) do

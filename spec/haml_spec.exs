@@ -17,7 +17,9 @@ defmodule HamlSpec do
           _ -> []
         end
         specify name do
-          expect(Hamlex.render unquote(haml), unquote(opts)).to eq unquote(html)
+          result = Hamlex.render unquote(haml), unquote(opts)
+          normalized_result = String.replace result, ~r/^ +/m, ""
+          expect(normalized_result).to eq unquote(html)
         end
       end
     end
