@@ -1,4 +1,8 @@
-defmodule Hamlex.Renderers.Prolog do
+defmodule Hamlex.Node.Prolog do
+  @derive [Hamlex.Node]
+  @type t :: %__MODULE__{type: String.t}
+  defstruct type: ""
+
   @prologs %{
     "html4" => %{
       "" => ~S(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">),
@@ -21,13 +25,14 @@ defmodule Hamlex.Renderers.Prolog do
     },
   }
 
-  @spec to_html(String.Chars.t, keyword) :: Hamlex.html
-  def to_html(body, [format: format]) do
+  @spec to_html(t, keyword) :: Hamlex.html
+  def to_html(%__MODULE__{type: type}, opts \\ []) do
+    opts = Keyword.merge Hamlex.default_options, opts
+    format = opts[:format]
     prologs = prologs_for_format format
-    body = body |> to_string |> String.trim
-    case Map.fetch(prologs, body) do
+    case Map.fetch(prologs, type) do
       {:ok, html} -> html
-      :error -> raise ArgumentError, "Don't know how to render a prolog for #{inspect body} in format #{inspect format}."
+      :error -> raise ArgumentError, "Don't know how to render a prolog for #{inspect type} in format #{inspect format}."
     end
   end
 

@@ -1,11 +1,18 @@
 defmodule Hamlex do
-  alias Hamlex.Renderers.{Element, Prolog}
+  alias Hamlex.Node
   @moduledoc """
   Documentation for Hamlex.
   """
 
+  @default_options [format: "html5"]
+
   @type haml :: String.t
   @type html :: String.t
+
+  @spec default_options() :: keyword
+  def default_options do
+    @default_options
+  end
 
   @doc """
   Renders a Haml string to HTML.
@@ -16,11 +23,12 @@ defmodule Hamlex do
     parsed |> to_html(opts)
   end
 
-  defp to_html([lines], opts) do
-    Enum.join (for line <- lines, do: to_html line, opts), "\n"
-  end
+  @typep line :: {integer, Node.t}
 
-  defp to_html(["!!!" | body], opts), do: Prolog.to_html(body, opts)
+  @spec to_html([[line]], keyword) :: html
+  defp to_html([lines], opts) do
+    Enum.join (for {indent, node} <- lines, do: Node.to_html node, opts), "\n"
+  end
 
   defp to_html(["%", name, selectors, body], opts) do
     Element.to_html name, selectors, body, opts
