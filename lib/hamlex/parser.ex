@@ -37,7 +37,7 @@ defmodule Hamlex.Parser do
   end
 
   defp element_name do
-    pipe [word, option(string "/")], &Enum.join/1
+    pipe [word_of(~r{[-\w:]+}), option(string "/")], &Enum.join/1
   end
 
   defp implicit_div do
