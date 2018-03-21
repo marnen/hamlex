@@ -45,11 +45,15 @@ defmodule Hamlex.Parser do
   end
 
   defp selector do
-    pipe [selector_sigil, word], &Enum.join/1
+    pipe [selector_sigil, css_identifier], &Enum.join/1
   end
 
   defp selector_sigil do
     either string(@sigils.class), string(@sigils.id)
+  end
+
+  defp css_identifier do
+    word_of ~r{[-\w]+}
   end
 
   defp rest do
