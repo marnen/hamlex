@@ -16,7 +16,7 @@ defmodule Hamlex.Parser do
   defp line, do: pipe [indent, expression], &List.to_tuple/1
 
   defp expression do
-     map choice([prolog, element, implicit_div]), &build_struct/1
+     map choice([prolog, element, implicit_div, text]), &build_struct/1
   end
 
   defp indent do
@@ -41,7 +41,7 @@ defmodule Hamlex.Parser do
   end
 
   defp implicit_div do
-    pipe [many(selector), rest], &build_div/1
+    pipe [many1(selector), rest], &build_div/1
   end
 
   defp selector do
@@ -54,6 +54,10 @@ defmodule Hamlex.Parser do
 
   defp css_identifier do
     word_of ~r{[-\w]+}
+  end
+
+  defp text do
+    rest
   end
 
   defp rest do
@@ -71,6 +75,7 @@ defmodule Hamlex.Parser do
     case params do
       [prolog, type] -> %Prolog{type: type |> to_string |> trim}
       [element, name, selectors, body] -> %Element{name: name, selectors: selectors, body: body}
+      text when is_binary(text) -> text
     end
   end
 
