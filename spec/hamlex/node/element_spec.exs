@@ -1,17 +1,18 @@
-defmodule Hamlex.Renderers.ElementSpec do
+defmodule Hamlex.Node.ElementSpec do
   use ESpec
-  import Hamlex.Renderers.Element
+  import Hamlex.Node.Element
+  alias Hamlex.Node.Element
 
   describe ".to_html" do
     context "name given" do
       it "renders a tag of the given name" do
-        expect(to_html "foo", [".bar"], [], []).to eq "<foo class='bar'></foo>"
+        expect(to_html %Element{name: "foo", selectors: [".bar"]}).to eq "<foo class='bar'></foo>"
       end
     end
 
     context "name not given" do
       it "renders a div" do
-        expect(to_html [".bar"], [], []).to eq "<div class='bar'></div>"
+        expect(to_html %Element{selectors: [".bar"]}).to eq "<div class='bar'></div>"
       end
     end
 
@@ -25,7 +26,7 @@ defmodule Hamlex.Renderers.ElementSpec do
         context "no slash" do
           it "renders a separate closing tag for all formats" do
             for format <- formats do
-              expect(to_html tag_name, [], [], format: format).to eq "<#{tag_name}></#{tag_name}>"
+              expect(to_html %Element{name: tag_name}, format: format).to eq "<#{tag_name}></#{tag_name}>"
             end
           end
         end
@@ -33,14 +34,14 @@ defmodule Hamlex.Renderers.ElementSpec do
         context "trailing slash" do
           context "XHTML" do
             it "renders a self-closing tag" do
-              expect(to_html "#{tag_name}/", [], [], format: "xhtml").to eq "<#{tag_name} />"
+              expect(to_html %Element{name: "#{tag_name}/"}, format: "xhtml").to eq "<#{tag_name} />"
             end
           end
 
           context "HTML 4 and 5" do
             it "renders a singleton tag" do
               for format <- all_html do
-                expect(to_html "#{tag_name}/", [], [], format: format).to eq "<#{tag_name}>"
+                expect(to_html %Element{name: "#{tag_name}/"}, format: format).to eq "<#{tag_name}>"
               end
             end
           end
@@ -53,7 +54,7 @@ defmodule Hamlex.Renderers.ElementSpec do
         context "XHTML" do
           it "renders a self-closing tag" do
             for tag_name <- void_elements do
-              expect(to_html tag_name, [], [], format: "xhtml").to eq "<#{tag_name} />"
+              expect(to_html %Element{name: tag_name}, format: "xhtml").to eq "<#{tag_name} />"
             end
           end
         end
@@ -62,7 +63,7 @@ defmodule Hamlex.Renderers.ElementSpec do
           it "renders a singleton tag" do
             for tag_name <- void_elements do
               for format <- all_html do
-                expect(to_html tag_name, [], [], format: format).to eq "<#{tag_name}>"
+                expect(to_html %Element{name: tag_name}, format: format).to eq "<#{tag_name}>"
               end
             end
           end

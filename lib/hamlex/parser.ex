@@ -1,10 +1,10 @@
 defmodule Hamlex.Parser do
   use Combine
+  alias Hamlex.Node.{Element, Prolog}
 
   @sigils %{
     class: ".",
     element: "%",
-    implicit_div: "%%",
     id: "#",
     prolog: "!!!"
   }
@@ -13,7 +13,15 @@ defmodule Hamlex.Parser do
 
   defp parser, do: sep_by line, ignore(newline)
 
-  defp line, do: choice [prolog, element, implicit_div]
+  defp line, do: pipe [indent, expression], &List.to_tuple/1
+
+  defp expression do
+     map choice([prolog, element, implicit_div]), &build_struct/1
+  end
+
+  defp indent do
+    map many(space), &length/1
+  end
 
   defp prolog do
     sequence [string(@sigils.prolog), rest]
@@ -33,7 +41,7 @@ defmodule Hamlex.Parser do
   end
 
   defp implicit_div do
-    pipe [many(selector), rest], &([@sigils.implicit_div | &1])
+    pipe [many(selector), rest], &build_div/1
   end
 
   defp selector do
@@ -46,5 +54,19 @@ defmodule Hamlex.Parser do
 
   defp rest do
     take_while(&(&1 not in '\r\n'))
+  end
+
+  defp build_div([selectors, body]) do
+    %Element{name: "div", selectors: selectors, body: body}
+  end
+
+  defp build_struct(%{__struct__: _} = struct), do: struct
+  defp build_struct(params) do
+    import String, only: [trim: 1]
+    %{prolog: prolog, element: element} = @sigils
+    case params do
+      [prolog, type] -> %Prolog{type: type |> to_string |> trim}
+      [element, name, selectors, body] -> %Element{name: name, selectors: selectors, body: body}
+    end
   end
 end
