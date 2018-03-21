@@ -10,6 +10,7 @@ defmodule Hamlex.Tree do
   end
 
   @spec nest([Hamlex.line]) :: t
+  defp nest([{_, node}]), do: node
   defp nest([{_, %{} = node} | children]) do
     %{node | body: from(children)}
   end

@@ -70,5 +70,13 @@ defmodule Hamlex.Node.ElementSpec do
         end
       end
     end
+
+    context "body" do
+      context "string" do
+        it "uses the string as the tag's content" do
+          expect(to_html %Element{name: "p", body: "string"}).to eq "<p>string</p>"
+        end
+      end
+    end
   end
 end

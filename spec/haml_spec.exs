@@ -9,6 +9,7 @@ defmodule HamlSpec do
     "basic Haml tags and CSS",
     "tags with unusual HTML characters",
     "tags with unusual CSS identifiers",
+    "tags with inline content",
   ]
 
   for {context_name, example_data} <- tests, context_name in @context_names do

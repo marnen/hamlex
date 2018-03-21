@@ -9,6 +9,12 @@ defmodule Hamlex.TreeSpec do
         line = {0, %Element{}}
         expect(Tree.from [line]).to eq [%Element{}]
       end
+
+      it "preserves body" do
+        element = %Element{body: "Lorem ipsum"}
+        line = {0, element}
+        expect(Tree.from [line]).to eq [element]
+      end
     end
 
     context "multiple lines with same indent" do

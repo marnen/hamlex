@@ -57,7 +57,7 @@ defmodule Hamlex.Parser do
   end
 
   defp rest do
-    take_while(&(&1 not in '\r\n'))
+    map take_while(&(&1 not in '\r\n')), &string_if_not_empty/1
   end
 
   defp build_div([selectors, body]) do
@@ -73,4 +73,7 @@ defmodule Hamlex.Parser do
       [element, name, selectors, body] -> %Element{name: name, selectors: selectors, body: body}
     end
   end
+
+  defp string_if_not_empty([]), do: []
+  defp string_if_not_empty(charlist), do: String.trim to_string charlist
 end

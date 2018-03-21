@@ -25,7 +25,8 @@ defmodule Hamlex.Node.Element do
   defp content_tag(%__MODULE__{body: body} = element, opts) do
     body_html = case body do
       [] -> nil
-      _ -> "\n" <> Utils.indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
+      [_|_] -> "\n" <> Utils.indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
+      _ -> body
     end
     Enum.join [opening_tag(element), body_html, closing_tag(element)]
   end
