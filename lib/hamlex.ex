@@ -21,8 +21,6 @@ defmodule Hamlex do
   @spec render(haml, keyword) :: html
   def render(haml, opts \\ []) do
     [parsed] = Hamlex.Parser.parse(haml)
-    tree = Tree.from(parsed)
-    IO.inspect tree
-    tree |> Enum.map_join(&(Node.to_html &1, opts))
+    Tree.from(parsed) |> Enum.map_join(&(Node.to_html &1, opts))
   end
 end

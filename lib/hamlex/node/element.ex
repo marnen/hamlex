@@ -27,8 +27,6 @@ defmodule Hamlex.Node.Element do
       [] -> nil
       _ -> "\n" <> Utils.indent(Enum.map_join body, "\n", &(Node.to_html &1, opts)) <> "\n"
     end
-    IO.puts Enum.join [opening_tag(element), body_html, closing_tag(element)]
-
     Enum.join [opening_tag(element), body_html, closing_tag(element)]
   end
 
@@ -46,9 +44,14 @@ defmodule Hamlex.Node.Element do
     "<#{name_and_attributes element}>"
   end
 
-  @spec process_selectors([Hamlex.haml]) :: %{id: [String.t], class: [String.t]}
+  @spec process_selectors([Hamlex.haml]) :: %{id: String.t | nil, class: [String.t]}
   defp process_selectors(selectors) do
-    selectors |> Enum.group_by(&selector_type/1, &String.slice(&1, 1..-1))
+    all_selectors = selectors |> Enum.group_by(&selector_type/1, &String.slice(&1, 1..-1))
+    if all_selectors[:id] do
+      Map.merge all_selectors, %{id: List.last all_selectors[:id]}
+    else
+      all_selectors
+    end
   end
 
   defp selector_type("#" <> _), do: :id
@@ -63,9 +66,11 @@ defmodule Hamlex.Node.Element do
     import Enum, only: [join: 1, join: 2]
 
     name = String.replace_suffix name, "/", ""
-    selector_string = for {type, values} <- process_selectors(selectors) do
-      " #{type}='#{join values, " "}'"
-    end |> join
+    selector_map = process_selectors(selectors)
+    selector_string = Enum.map(selector_map, fn {type, value} ->
+      attribute_string = if  is_list(value), do: join(value, " "), else: value
+      " #{type}='#{attribute_string}'"
+    end) |> join
     join [name, selector_string]
   end
 end
