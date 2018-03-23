@@ -11,6 +11,7 @@ defmodule HamlSpec do
     "tags with unusual CSS identifiers",
     "tags with inline content",
     "tags with nested content",
+    "tags with HTML-style attributes",
   ]
 
   for {context_name, example_data} <- tests, context_name in @context_names do

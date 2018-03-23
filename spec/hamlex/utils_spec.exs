@@ -15,4 +15,10 @@ defmodule Hamlex.UtilsSpec do
       end
     end
   end
+
+  describe ".q" do
+    it "surrounds the given string with single quotes" do
+      expect(Utils.q " a string ").to eq "' a string '"
+    end
+  end
 end

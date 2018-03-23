@@ -32,6 +32,7 @@ defmodule Hamlex.Parser do
       string(@sigils.element),
       element_name,
       many(selector),
+      option(attributes),
       rest
     ]
   end
@@ -56,12 +57,36 @@ defmodule Hamlex.Parser do
     word_of ~r{[-\w]+}
   end
 
+  defp attributes do
+    html_attributes
+  end
+
+  defp html_attributes do
+    between(char(?(), sep_by(html_attribute, ignore(word_of(~r{[\s\n\r]+}))), char(?)))
+  end
+
+  defp html_attribute do
+    either equal_attribute, attribute_name
+  end
+
+  defp equal_attribute do
+    pipe [attribute_name, ignore(char ?=), quoted_string], &List.to_tuple/1
+  end
+
+  defp attribute_name do
+    word_of(~r{[-\w]+})
+  end
+
+  defp quoted_string do
+    between char(?'), word_of(~r{[^']+}), char(?')
+  end
+
   defp text do
-    rest
+    map take_while(&(&1 not in '\r\n')), &string_if_not_empty/1
   end
 
   defp rest do
-    map take_while(&(&1 not in '\r\n')), &string_if_not_empty/1
+    option pair_right(spaces, text)
   end
 
   defp build_div([selectors, body]) do
@@ -74,8 +99,9 @@ defmodule Hamlex.Parser do
     %{prolog: prolog, element: element} = @sigils
     case params do
       [prolog, type] -> %Prolog{type: type |> to_string |> trim}
-      [element, name, selectors, body] -> %Element{name: name, selectors: selectors, body: body}
-      text when is_binary(text) -> text
+      [element, name, selectors, attributes, body] ->
+        %Element{name: name, selectors: selectors, attributes: (attributes || []), body: body}
+      string when is_binary(string) -> string
     end
   end
 

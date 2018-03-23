@@ -2,8 +2,14 @@ defmodule Hamlex.Node.Element do
   alias Hamlex.{Node, Utils}
   @derive [Node]
   @type selector :: String.t
-  @type t :: %__MODULE__{name: String.t, selectors: [selector], body: [Node.t]}
-  defstruct name: "div", selectors: [], body: []
+  @type attributes :: [{String.t, String.t}]
+  @type t :: %__MODULE__{
+    name: String.t,
+    selectors: [selector],
+    attributes: attributes,
+    body: [Node.t]
+  }
+  defstruct name: "div", selectors: [], attributes: [], body: []
 
   @void_elements ~w[area base br col embed hr img input link meta param source track wbr] # see https://www.w3.org/TR/html52/syntax.html#void-elements
 
@@ -63,15 +69,22 @@ defmodule Hamlex.Node.Element do
     name in @void_elements or name |> ends_with?("/")
   end
 
-  defp name_and_attributes(%__MODULE__{name: name, selectors: selectors}) do
+  defp name_and_attributes(%__MODULE__{name: name, selectors: selectors, attributes: attributes}) do
     import Enum, only: [join: 1, join: 2]
+    import Utils, only: [q: 1]
 
     name = String.replace_suffix name, "/", ""
     selector_map = process_selectors(selectors)
     selector_string = Enum.map(selector_map, fn {type, value} ->
-      attribute_string = if  is_list(value), do: join(value, " "), else: value
-      " #{type}='#{attribute_string}'"
+      attribute_string = if is_list(value), do: join(value, " "), else: value
+      " #{type}=#{q attribute_string}"
     end) |> join
-    join [name, selector_string]
+    attribute_string = for attribute <- attributes do
+      case attribute do
+        {name, value} -> " #{name}=#{q value}"
+        name -> " #{name}"
+      end
+    end
+    join [name, selector_string, attribute_string]
   end
 end

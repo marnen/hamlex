@@ -78,5 +78,17 @@ defmodule Hamlex.Node.ElementSpec do
         end
       end
     end
+
+    context "attributes" do
+      it "renders the attributes in the tag" do
+        element = %Element{name: "p", selectors: [".class"], attributes: [{"a", "b"}, {"c", "d"}]}
+        expect(to_html element).to eq "<p class='class' a='b' c='d'></p>"
+      end
+
+      it "renders atomic attributes as the name alone" do
+        element = %Element{name: "p", attributes: ["atomic"]}
+        expect(to_html element).to eq "<p atomic></p>"
+      end
+    end
   end
 end

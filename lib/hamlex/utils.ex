@@ -5,4 +5,9 @@ defmodule Hamlex.Utils do
     lines = for line <- String.split(string, "\n"), do: spaces <> line
     Enum.join lines, "\n"
   end
+
+  @spec q(String.t) :: String.t
+  def q(string) do
+    "'" <> string <> "'"
+  end
 end
