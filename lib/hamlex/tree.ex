@@ -1,5 +1,5 @@
 defmodule Hamlex.Tree do
-  @type t :: [Hamlex.Node.t]
+  @type t :: [[Hamlex.Node.t]]
   @spec from([Hamlex.line]) :: t
   def from([]), do: []
   def from([({starting_indent, _node} = head) | tail]) do
