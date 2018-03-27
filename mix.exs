@@ -32,6 +32,7 @@ defmodule Hamlex.Mixfile do
   defp deps do
     [
       {:combine, "~> 0.10.0"},
+      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
       {:espec, "~> 1.4.6", only: :test},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false, github: "ignota/mix-test.watch", ref: "8ee5c331059e821830a325cd59e87821b3434f88"}, # TODO: waiting for https://github.com/lpil/mix-test.watch/pull/85
       {:poison, "~> 3.1", only: :test},
