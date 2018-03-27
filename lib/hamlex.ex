@@ -4,7 +4,7 @@ defmodule Hamlex do
   Documentation for Hamlex.
   """
 
-  @default_options [format: "html5"]
+  @default_options [config: %{format: "html5"}]
 
   @type haml :: String.t
   @type html :: String.t

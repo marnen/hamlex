@@ -28,8 +28,10 @@ defmodule Hamlex.Node.Prolog do
 
   @spec to_html(t, keyword) :: Hamlex.html
   def to_html(%__MODULE__{type: type, body: []}, opts \\ []) do
+    # TODO: see if we can move option processing elsewhere
     opts = Keyword.merge Hamlex.default_options, opts
-    format = opts[:format]
+    format = opts[:config][:format]
+
     prologs = prologs_for_format format
     case Map.fetch(prologs, type) do
       {:ok, html} -> html

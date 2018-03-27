@@ -26,7 +26,7 @@ defmodule Hamlex.Node.ElementSpec do
         context "no slash" do
           it "renders a separate closing tag for all formats" do
             for format <- formats do
-              expect(to_html %Element{name: tag_name}, format: format).to eq "<#{tag_name}></#{tag_name}>"
+              expect(to_html %Element{name: tag_name}, config: %{format: format}).to eq "<#{tag_name}></#{tag_name}>"
             end
           end
         end
@@ -34,14 +34,14 @@ defmodule Hamlex.Node.ElementSpec do
         context "trailing slash" do
           context "XHTML" do
             it "renders a self-closing tag" do
-              expect(to_html %Element{name: "#{tag_name}/"}, format: "xhtml").to eq "<#{tag_name} />"
+              expect(to_html %Element{name: "#{tag_name}/"}, config: %{format: "xhtml"}).to eq "<#{tag_name} />"
             end
           end
 
           context "HTML 4 and 5" do
             it "renders a singleton tag" do
               for format <- all_html do
-                expect(to_html %Element{name: "#{tag_name}/"}, format: format).to eq "<#{tag_name}>"
+                expect(to_html %Element{name: "#{tag_name}/"}, config: %{format: format}).to eq "<#{tag_name}>"
               end
             end
           end
@@ -54,7 +54,7 @@ defmodule Hamlex.Node.ElementSpec do
         context "XHTML" do
           it "renders a self-closing tag" do
             for tag_name <- void_elements do
-              expect(to_html %Element{name: tag_name}, format: "xhtml").to eq "<#{tag_name} />"
+              expect(to_html %Element{name: tag_name}, config: %{format: "xhtml"}).to eq "<#{tag_name} />"
             end
           end
         end
@@ -63,7 +63,7 @@ defmodule Hamlex.Node.ElementSpec do
           it "renders a singleton tag" do
             for tag_name <- void_elements do
               for format <- all_html do
-                expect(to_html %Element{name: tag_name}, format: format).to eq "<#{tag_name}>"
+                expect(to_html %Element{name: tag_name}, config: %{format: format}).to eq "<#{tag_name}>"
               end
             end
           end
