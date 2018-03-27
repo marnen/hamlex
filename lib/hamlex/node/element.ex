@@ -15,8 +15,9 @@ defmodule Hamlex.Node.Element do
 
   @spec to_html(t, keyword) :: Hamlex.html
   def to_html(%__MODULE__{} = element, opts \\ []) do
+    # TODO: see if we can move option processing elsewhere
     opts = Keyword.merge Hamlex.default_options, opts
-    format = opts[:format]
+    format = opts[:config][:format]
 
     if self_closing?(element) do
       case format do

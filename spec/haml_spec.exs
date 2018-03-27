@@ -16,13 +16,15 @@ defmodule HamlSpec do
 
   for {context_name, example_data} <- tests, context_name in @context_names do
     context context_name do
+      import String, only: [to_atom: 1]
       for {name, %{"haml" => haml, "html" => html} = fields} <- example_data do
-        opts = case fields do
-          %{"config" => config} -> for {key, value} <- config, do: {key |> String.to_atom, value}
-          _ -> []
+        opts = for field_name <- ["config", "locals"], into: [] do
+          opt = Map.get fields, field_name, %{}
+          {field_name |> to_atom, (for {key, value} <- opt, into: %{}, do: {key |> String.to_atom, value})}
         end
+
         specify name do
-          result = Hamlex.render unquote(haml), unquote(opts)
+          result = Hamlex.render unquote(haml), unquote(Macro.escape opts)
           normalized_result = String.replace result, ~r/^ +/m, ""
           expect(normalized_result).to eq unquote(html)
         end
