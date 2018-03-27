@@ -2,14 +2,18 @@ defmodule Hamlex.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :hamlex,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     preferred_cli_env: [espec: :test],
-     dialyzer: [flags: [:unknown, :underspecs, :unmatched_returns]]
+    [
+      app: :hamlex,
+      version: "0.1.0",
+      elixir: "~> 1.4",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      preferred_cli_env: [espec: :test],
+      dialyzer: [
+        flags: [:unknown, :underspecs, :unmatched_returns],
+        ignore_warnings: "dialyzer.ignore-warnings",
+      ],
     ]
   end
 

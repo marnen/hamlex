@@ -1,0 +1,11 @@
+# TODO: shouldn't @fallback_to_any take care of this?
+:0: Unknown function 'Elixir.Hamlex.Node.Atom':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Float':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Function':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Integer':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.List':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Map':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.PID':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Port':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Reference':'__impl__'/1
+:0: Unknown function 'Elixir.Hamlex.Node.Tuple':'__impl__'/1
