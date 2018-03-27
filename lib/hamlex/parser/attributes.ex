@@ -10,22 +10,20 @@ defmodule Hamlex.Parser.Attributes do
   end
 
   defp equal_attribute do
-    pipe [attribute_name, ignore(char ?=), quoted_string], &List.to_tuple/1
+    pipe [attribute_name, ignore(char ?=), attribute_value], &List.to_tuple/1
   end
 
   defp attribute_name do
     word_of(~r{[-\w]+})
   end
 
-  defp quoted_string do
-    either single_quoted_string, double_quoted_string
+  defp attribute_value do
+    either single_quoted_string, variable_name
   end
 
   defp single_quoted_string do
     between char(?'), word_of(~r{[^']+}), char(?')
   end
 
-  defp double_quoted_string do
-    between char(?"), word_of(~r{[^"]+}), char(?")
-  end
+  defp variable_name, do: word |> map(&{:var, &1})
 end

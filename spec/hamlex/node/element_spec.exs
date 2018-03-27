@@ -89,6 +89,14 @@ defmodule Hamlex.Node.ElementSpec do
         element = %Element{name: "p", attributes: ["atomic"]}
         expect(to_html element).to eq "<p atomic></p>"
       end
+
+      context "variable attributes" do
+        it "renders the value from the binding" do
+          element = %Element{name: "p", attributes: [{"z", {:var, "variable"}}]}
+          value = "actual value"
+          expect(to_html element, locals: %{variable: value}).to eq "<p z='#{value}'></p>"
+        end
+      end
     end
   end
 end
