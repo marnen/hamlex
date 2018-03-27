@@ -18,6 +18,14 @@ defmodule Hamlex.Parser.Attributes do
   end
 
   defp quoted_string do
+    either single_quoted_string, double_quoted_string
+  end
+
+  defp single_quoted_string do
     between char(?'), word_of(~r{[^']+}), char(?')
+  end
+
+  defp double_quoted_string do
+    between char(?"), word_of(~r{[^"]+}), char(?")
   end
 end
