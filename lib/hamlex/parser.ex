@@ -43,7 +43,7 @@ defmodule Hamlex.Parser do
   end
 
   defp implicit_div do
-    pipe [many1(selector), rest], &build_div/1
+    pipe [many1(selector), option(attributes), rest], &build_div/1
   end
 
   defp selector do
@@ -70,9 +70,7 @@ defmodule Hamlex.Parser do
     option pair_right(spaces, text)
   end
 
-  defp build_div([selectors, body]) do
-    %Element{name: "div", selectors: selectors, body: body}
-  end
+  defp build_div(params), do: build_struct ["%", "div" | params]
 
   defp build_struct(%{__struct__: _} = struct), do: struct
   defp build_struct(params) do
@@ -81,7 +79,7 @@ defmodule Hamlex.Parser do
     case params do
       [prolog, type] -> %Prolog{type: type |> to_string |> trim}
       [element, name, selectors, attributes, body] ->
-        %Element{name: name, selectors: selectors, attributes: (attributes || []), body: body}
+        %Element{name: name, selectors: selectors, attributes: List.wrap(attributes), body: body}
       string when is_binary(string) -> string
     end
   end
