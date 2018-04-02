@@ -4,7 +4,8 @@ defmodule Hamlex do
   Documentation for Hamlex.
   """
 
-  @default_options [config: %{format: "html5"}]
+  # TODO: rename :locals to :binding
+  @default_options [config: %{format: "html5"}, locals: %{}]
 
   @type haml :: String.t
   @type html :: String.t

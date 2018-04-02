@@ -21,4 +21,10 @@ defmodule Hamlex.UtilsSpec do
       expect(Utils.q " a string ").to eq "' a string '"
     end
   end
+
+  describe ".qq" do
+    it "surrounds the given string with double quotes" do
+      expect(Utils.qq " a string ").to eq ~S(" a string ")
+    end
+  end
 end

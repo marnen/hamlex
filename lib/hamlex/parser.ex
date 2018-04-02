@@ -1,6 +1,7 @@
 defmodule Hamlex.Parser do
   use Combine
   alias Hamlex.Node.{Element, Prolog}
+  alias Hamlex.Parser.Attributes
 
   @sigils %{
     class: ".",
@@ -42,7 +43,7 @@ defmodule Hamlex.Parser do
   end
 
   defp implicit_div do
-    pipe [many1(selector), rest], &build_div/1
+    pipe [many1(selector), option(attributes), rest], &build_div/1
   end
 
   defp selector do
@@ -58,27 +59,7 @@ defmodule Hamlex.Parser do
   end
 
   defp attributes do
-    html_attributes
-  end
-
-  defp html_attributes do
-    between(char(?(), sep_by(html_attribute, ignore(word_of(~r{[\s\n\r]+}))), char(?)))
-  end
-
-  defp html_attribute do
-    either equal_attribute, attribute_name
-  end
-
-  defp equal_attribute do
-    pipe [attribute_name, ignore(char ?=), quoted_string], &List.to_tuple/1
-  end
-
-  defp attribute_name do
-    word_of(~r{[-\w]+})
-  end
-
-  defp quoted_string do
-    between char(?'), word_of(~r{[^']+}), char(?')
+    Attributes.html_attributes
   end
 
   defp text do
@@ -89,9 +70,7 @@ defmodule Hamlex.Parser do
     option pair_right(spaces, text)
   end
 
-  defp build_div([selectors, body]) do
-    %Element{name: "div", selectors: selectors, body: body}
-  end
+  defp build_div(params), do: build_struct ["%", "div" | params]
 
   defp build_struct(%{__struct__: _} = struct), do: struct
   defp build_struct(params) do
@@ -100,7 +79,7 @@ defmodule Hamlex.Parser do
     case params do
       [prolog, type] -> %Prolog{type: type |> to_string |> trim}
       [element, name, selectors, attributes, body] ->
-        %Element{name: name, selectors: selectors, attributes: (attributes || []), body: body}
+        %Element{name: name, selectors: selectors, attributes: List.wrap(attributes), body: body}
       string when is_binary(string) -> string
     end
   end
