@@ -12,6 +12,7 @@ defmodule HamlSpec do
     "tags with inline content",
     "tags with nested content",
     "tags with HTML-style attributes",
+    "tags with Ruby-style attributes",
   ]
 
   for {context_name, example_data} <- tests, context_name in @context_names do

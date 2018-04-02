@@ -59,7 +59,7 @@ defmodule Hamlex.Parser do
   end
 
   defp attributes do
-    Attributes.html_attributes
+    either Attributes.html_attributes, Attributes.ruby_attributes
   end
 
   defp text do
