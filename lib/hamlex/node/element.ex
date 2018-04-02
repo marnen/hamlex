@@ -52,6 +52,17 @@ defmodule Hamlex.Node.Element do
     "<#{name_and_attributes element}>"
   end
 
+  @spec normalize_selectors(%__MODULE__{}) :: %__MODULE__{}
+  defp normalize_selectors(%__MODULE__{selectors: selectors, attributes: attributes} = element) do
+    {class, other_attributes} = attributes |> Enum.split_with(&(is_tuple(&1) && match?({"class", _}, &1)))
+    case class do
+      [{"class", classes}] ->
+        new_selectors = String.split(classes) |> Enum.map(&".#{&1}")
+        %{element | selectors: Enum.sort(selectors ++ new_selectors), attributes: other_attributes}
+      _ -> element
+    end
+  end
+
   @spec process_selectors([Hamlex.haml]) :: %{id: String.t | nil, class: [String.t]}
   defp process_selectors(selectors) do
     all_selectors = selectors |> Enum.group_by(&selector_type/1, &String.slice(&1, 1..-1))
@@ -70,11 +81,13 @@ defmodule Hamlex.Node.Element do
     name in @void_elements or name |> ends_with?("/")
   end
 
-  defp name_and_attributes(%__MODULE__{name: name, selectors: selectors, attributes: attributes}) do
+  defp name_and_attributes(%__MODULE__{name: name} = element) do
     import Enum, only: [join: 1, join: 2]
     import Utils, only: [q: 1]
 
     name = String.replace_suffix name, "/", ""
+    element = normalize_selectors(element)
+    %{selectors: selectors, attributes: attributes} = element
     selector_map = process_selectors(selectors)
     selector_string = Enum.map(selector_map, fn {type, value} ->
       attribute_string = if is_list(value), do: join(value, " "), else: value
