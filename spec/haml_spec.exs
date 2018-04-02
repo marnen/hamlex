@@ -13,6 +13,7 @@ defmodule HamlSpec do
     "tags with nested content",
     "tags with HTML-style attributes",
     "tags with Ruby-style attributes",
+    "silent comments",
   ]
 
   for {context_name, example_data} <- tests, context_name in @context_names do

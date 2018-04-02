@@ -1,13 +1,14 @@
 defmodule Hamlex.Parser do
   use Combine
-  alias Hamlex.Node.{Element, Prolog}
+  alias Hamlex.Node.{Element, Prolog, SilentComment}
   alias Hamlex.Parser.Attributes
 
   @sigils %{
     class: ".",
     element: "%",
     id: "#",
-    prolog: "!!!"
+    prolog: "!!!",
+    silent_comment: "-#"
   }
 
   def parse(haml), do: Combine.parse(haml, parser)
@@ -17,7 +18,7 @@ defmodule Hamlex.Parser do
   defp line, do: pipe [indent, expression], &List.to_tuple/1
 
   defp expression do
-     map choice([prolog, element, implicit_div, text]), &build_struct/1
+     map choice([prolog, element, implicit_div, silent_comment, text]), &build_struct/1
   end
 
   defp indent do
@@ -66,6 +67,8 @@ defmodule Hamlex.Parser do
     map take_while(&(&1 not in '\r\n')), &string_if_not_empty/1
   end
 
+  defp silent_comment, do: sequence [string(@sigils.silent_comment), rest]
+
   defp rest do
     option pair_right(spaces, text)
   end
@@ -75,11 +78,12 @@ defmodule Hamlex.Parser do
   defp build_struct(%{__struct__: _} = struct), do: struct
   defp build_struct(params) do
     import String, only: [trim: 1]
-    %{prolog: prolog, element: element} = @sigils
+    %{prolog: prolog, element: element, silent_comment: silent_comment} = @sigils
     case params do
-      [prolog, type] -> %Prolog{type: type |> to_string |> trim}
-      [element, name, selectors, attributes, body] ->
+      [^prolog, type] -> %Prolog{type: type |> to_string |> trim}
+      [^element, name, selectors, attributes, body] ->
         %Element{name: name, selectors: selectors, attributes: List.wrap(attributes), body: body}
+      [^silent_comment, _] -> %SilentComment{}
       string when is_binary(string) -> string
     end
   end
