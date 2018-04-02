@@ -3,9 +3,8 @@ defmodule Hamlex.Node.Element do
   @derive [Node]
   @type selector :: String.t
   @type attribute_name :: String.t
-  @type attribute_value :: String.t | variable
-  @type variable_name :: String.t
-  @type variable :: {:var, variable_name}
+  @type attribute_value :: {attribute_type, String.t}
+  @type attribute_type :: :string | :elixir | :var
   @type attribute :: (atomic :: attribute_name) | {name :: attribute_name, value :: attribute_value}
   @type attributes :: [attribute]
   @type selector_map :: %{id: String.t | nil, class: [String.t]}
@@ -73,7 +72,7 @@ defmodule Hamlex.Node.Element do
     extra_classes = flatten(for {"class", classes} <- class, do: String.split(resolve classes, opts))
     new_classes = sort map List.wrap(original_selectors[:class]) ++ extra_classes, &("." <> &1)
 
-    extra_ids = flatten(for {"id", ids} <- id, do: String.split(ids))
+    extra_ids = flatten(for {"id", ids} <- id, do: String.split(resolve ids, opts))
     all_ids = List.wrap(original_selectors[:id]) ++ extra_ids
     new_id = if empty?(all_ids), do: [], else: ["#" <> (all_ids |> Enum.join("_"))]
 
@@ -107,7 +106,7 @@ defmodule Hamlex.Node.Element do
     selector_map = selector_map(selectors)
     selector_string = map(selector_map, fn {type, value} ->
       value_string = if is_list(value), do: join(value, " "), else: value
-      attribute_string {type, value_string}, opts
+      attribute_string {type, {:string, value_string}}, opts
     end) |> join
     attribute_strings = map attributes, &(attribute_string &1, opts)
     join [name, selector_string, attribute_strings]
@@ -115,7 +114,11 @@ defmodule Hamlex.Node.Element do
 
   @spec resolve(attribute_value, keyword) :: String.t
   defp resolve({:var, key}, opts), do: Map.fetch!(opts[:locals], String.to_existing_atom key)
-  defp resolve(value, _opts), do: value
+  defp resolve({:string, string}, _opts), do: string
+  defp resolve({:elixir, expr}, opts) do
+    # TODO: review for security
+    with {result, _} <- Code.eval_string(Utils.qq(expr), Enum.into(opts[:locals], [])), do: to_string result
+  end
 
   @spec attribute_string(attribute, keyword) :: String.t
   defp attribute_string({name, value}, opts), do: " #{name}=#{Utils.q resolve(value, opts)}"

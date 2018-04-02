@@ -10,4 +10,9 @@ defmodule Hamlex.Utils do
   def q(string) do
     "'" <> string <> "'"
   end
+
+  @spec qq(String.t) :: String.t
+  def qq(string) do
+    ~S(") <> string <> ~S(")
+  end
 end

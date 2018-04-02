@@ -81,7 +81,7 @@ defmodule Hamlex.Node.ElementSpec do
 
     context "attributes" do
       it "renders the attributes in the tag" do
-        element = %Element{name: "p", selectors: [".class"], attributes: [{"a", "b"}, {"c", "d"}]}
+        element = %Element{name: "p", selectors: [".class"], attributes: [{"a", {:string, "b"}}, {"c", {:string, "d"}}]}
         expect(to_html element).to eq "<p class='class' a='b' c='d'></p>"
       end
 
@@ -100,14 +100,14 @@ defmodule Hamlex.Node.ElementSpec do
 
       context "class" do
         it "unifies the class attributes with the . selector, in alphabetical order" do
-          element = %Element{name: "p", selectors: [".b"], attributes: [{"class", "a c"}]}
+          element = %Element{name: "p", selectors: [".b"], attributes: [{"class", {:string, "a c"}}]}
           expect(to_html element).to eq "<p class='a b c'></p>"
         end
       end
 
       context "id" do
         it "joins the id attributes to the # selector with underscores" do
-          element = %Element{name: "p", selectors: ["#z"], attributes: [{"id", "a"}]}
+          element = %Element{name: "p", selectors: ["#z"], attributes: [{"id", {:string, "a"}}]}
           expect(to_html element).to eq "<p id='z_a'></p>"
         end
       end
