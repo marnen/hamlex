@@ -2,7 +2,10 @@ defmodule Hamlex.Node.Element do
   alias Hamlex.{Node, Utils}
   @derive [Node]
   @type selector :: String.t
-  @type attributes :: [{String.t, String.t}]
+  @type attribute_name :: String.t
+  @type attribute_value :: String.t
+  @type attribute :: attribute_name | {attribute_name, attribute_value}
+  @type attributes :: [attribute]
   @type selector_map :: %{id: String.t | nil, class: [String.t]}
   @type t :: %__MODULE__{
     name: String.t,
