@@ -89,6 +89,20 @@ defmodule Hamlex.Node.ElementSpec do
         element = %Element{name: "p", attributes: ["atomic"]}
         expect(to_html element).to eq "<p atomic></p>"
       end
+
+      context "class" do
+        it "unifies the class attributes with the . selector, in alphabetical order" do
+          element = %Element{name: "p", selectors: [".b"], attributes: [{"class", "a c"}]}
+          expect(to_html element).to eq "<p class='a b c'></p>"
+        end
+      end
+
+      context "id" do
+        it "joins the id attributes to the # selector with underscores" do
+          element = %Element{name: "p", selectors: ["#z"], attributes: [{"id", "a"}]}
+          expect(to_html element).to eq "<p id='z_a'></p>"
+        end
+      end
     end
   end
 end

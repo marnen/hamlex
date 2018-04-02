@@ -2,7 +2,11 @@ defmodule Hamlex.Node.Element do
   alias Hamlex.{Node, Utils}
   @derive [Node]
   @type selector :: String.t
-  @type attributes :: [{String.t, String.t}]
+  @type attribute_name :: String.t
+  @type attribute_value :: String.t
+  @type attribute :: attribute_name | {attribute_name, attribute_value}
+  @type attributes :: [attribute]
+  @type selector_map :: %{id: String.t | nil, class: [String.t]}
   @type t :: %__MODULE__{
     name: String.t,
     selectors: [selector],
@@ -52,8 +56,32 @@ defmodule Hamlex.Node.Element do
     "<#{name_and_attributes element}>"
   end
 
-  @spec process_selectors([Hamlex.haml]) :: %{id: String.t | nil, class: [String.t]}
-  defp process_selectors(selectors) do
+  @spec normalize_selectors(t) :: t
+  defp normalize_selectors(%__MODULE__{selectors: selectors, attributes: attributes} = element) do
+    import Enum, only: [empty?: 1, map: 2, sort: 1]
+    import List, only: [flatten: 1]
+
+    original_selectors = selector_map selectors
+
+    %{class: class, id: id, other: other_attributes} = Map.merge %{class: [], id: [], other: []}, Enum.group_by(attributes, fn attribute ->
+      case attribute do
+        {key, _} when key in ["class", "id"] -> String.to_existing_atom key
+        _ -> :other
+      end
+    end)
+
+    extra_classes = flatten(for {"class", classes} <- class, do: String.split(classes))
+    new_classes = sort map List.wrap(original_selectors[:class]) ++ extra_classes, &("." <> &1)
+
+    extra_ids = flatten(for {"id", ids} <- id, do: String.split(ids))
+    all_ids = List.wrap(original_selectors[:id]) ++ extra_ids
+    new_id = if empty?(all_ids), do: [], else: ["#" <> (all_ids |> Enum.join("_"))]
+
+    %{element | selectors: new_id ++ new_classes, attributes: other_attributes}
+  end
+
+  @spec selector_map([Hamlex.haml]) :: selector_map
+  defp selector_map(selectors) do
     all_selectors = selectors |> Enum.group_by(&selector_type/1, &String.slice(&1, 1..-1))
     if all_selectors[:id] do
       Map.merge all_selectors, %{id: List.last all_selectors[:id]}
@@ -70,12 +98,14 @@ defmodule Hamlex.Node.Element do
     name in @void_elements or name |> ends_with?("/")
   end
 
-  defp name_and_attributes(%__MODULE__{name: name, selectors: selectors, attributes: attributes}) do
+  defp name_and_attributes(%__MODULE__{name: name} = element) do
     import Enum, only: [join: 1, join: 2]
     import Utils, only: [q: 1]
 
     name = String.replace_suffix name, "/", ""
-    selector_map = process_selectors(selectors)
+    element = normalize_selectors(element)
+    %{selectors: selectors, attributes: attributes} = element
+    selector_map = selector_map(selectors)
     selector_string = Enum.map(selector_map, fn {type, value} ->
       attribute_string = if is_list(value), do: join(value, " "), else: value
       " #{type}=#{q attribute_string}"
